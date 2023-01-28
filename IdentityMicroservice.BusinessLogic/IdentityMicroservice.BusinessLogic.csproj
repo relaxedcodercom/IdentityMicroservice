@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityMicroservice.Domain\IdentityMicroservice.Domain.csproj" />
+    <ProjectReference Include="..\IdentityMicroservice.Repositories\IdentityMicroservice.Repositories.csproj" />
+    <ProjectReference Include="..\IdentityMicroservice.Services\IdentityMicroservice.Services.csproj" />
+  </ItemGroup>
+
+</Project>
