@@ -43,9 +43,9 @@ namespace IdentityMicroservice.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] string refreshToken)
+        public async Task<IActionResult> Logout([FromBody] TokenModel tokenModel)
         {
-            await authBusinessLogic.ProcessLogout(refreshToken, GetUserIdFromRequest());
+            await authBusinessLogic.ProcessLogout(tokenModel.RefreshToken, GetUserIdFromRequest());
 
             return Ok();
         }

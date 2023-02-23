@@ -1,5 +1,6 @@
 using IdentityMicroservice.DI;
 using IdentityMicroservice.Middlewares;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(config =>
+{
+    config.WithOrigins(builder.Configuration.GetSection("CORS:Allow-Origins").Get<string[]>())
+       .AllowAnyHeader().AllowAnyMethod();
+});
 
 if (!app.Environment.IsDevelopment())
 {
