@@ -15,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using IdentityMicroservice.Services.Contracts.Google;
+using IdentityMicroservice.Services.Google;
 
 namespace IdentityMicroservice.DI
 {
@@ -35,6 +37,7 @@ namespace IdentityMicroservice.DI
 
             services.AddScoped<ICryptoService, CryptoService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IRecaptchaV2Service, RecaptchaV2Service>();
 
             services.AddScoped<IUserMapper, UserMapper>();
             services.AddScoped<IUserSessionMapper, UserSessionMapper>();

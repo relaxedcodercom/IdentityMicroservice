@@ -2,7 +2,10 @@
 using IdentityMicroservice.Domain.Entities;
 using IdentityMicroservice.Repositories.Contracts;
 using IdentityMicroservice.Services.Contracts;
+using IdentityMicroservice.Services.Contracts.Google;
+using IdentityMicroservice.Services.Google;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
 using System.Security.Claims;
 
 namespace IdentityMicroservice.BusinessLogic
@@ -14,15 +17,18 @@ namespace IdentityMicroservice.BusinessLogic
         private readonly ICryptoService cryptoService;
         private readonly ITokenService tokenService;
         private readonly IConfiguration configuration;
+        private readonly IRecaptchaV2Service recaptchaV2Service;
 
         public AuthBusinessLogic(IUsersRepository usersRepository, IUserSessionsRepository userSessionsRepository,
-            ICryptoService cryptoService, ITokenService tokenService, IConfiguration configuration)
+            ICryptoService cryptoService, ITokenService tokenService, IConfiguration configuration,
+            IRecaptchaV2Service recaptchaV2Service)
         {
             this.usersRepository = usersRepository;
             this.userSessionsRepository = userSessionsRepository;
             this.cryptoService = cryptoService;
             this.tokenService = tokenService;
             this.configuration = configuration;
+            this.recaptchaV2Service = recaptchaV2Service;
         }
 
         public async Task<User> ProcessRegisterUser(RegisterUser registerUser)
@@ -30,6 +36,11 @@ namespace IdentityMicroservice.BusinessLogic
             if (registerUser == null)
             {
                 throw new ArgumentNullException(nameof(registerUser));
+            }
+
+            if (!await recaptchaV2Service.ValidateReCaptchaResponse(registerUser.Recaptcha))
+            {
+                throw new ApplicationException("Please validate ReCaptcha!");
             }
 
             if (await usersRepository.UsernameExists(registerUser.Username))
@@ -50,6 +61,11 @@ namespace IdentityMicroservice.BusinessLogic
             if (loginCredentials == null)
             {
                 throw new ArgumentNullException(nameof(loginCredentials));
+            }
+
+            if (!await recaptchaV2Service.ValidateReCaptchaResponse(loginCredentials.Recaptcha))
+            {
+                throw new ApplicationException("Please validate ReCaptcha!");
             }
 
             User user = null;

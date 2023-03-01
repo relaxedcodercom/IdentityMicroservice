@@ -1,2 +1,9 @@
 # IdentityMicroservice
-Identity Microservice API for managing users - register, login, logout, logout everywhere and authorization with OAuth 2
+.NET 7 Identity Microservice API for managing users with OAuth 2 support
+
+# Features
+* Login
+* Register new users
+* Logout
+* Logout everywhere
+* Google reCAPTCHA
