@@ -18,10 +18,11 @@ namespace IdentityMicroservice.BusinessLogic
         private readonly ITokenService tokenService;
         private readonly IConfiguration configuration;
         private readonly IRecaptchaV2Service recaptchaV2Service;
+        private readonly IRecaptchaV3Service recaptchaV3Service;
 
         public AuthBusinessLogic(IUsersRepository usersRepository, IUserSessionsRepository userSessionsRepository,
             ICryptoService cryptoService, ITokenService tokenService, IConfiguration configuration,
-            IRecaptchaV2Service recaptchaV2Service)
+            IRecaptchaV2Service recaptchaV2Service, IRecaptchaV3Service recaptchaV3Service)
         {
             this.usersRepository = usersRepository;
             this.userSessionsRepository = userSessionsRepository;
@@ -29,20 +30,32 @@ namespace IdentityMicroservice.BusinessLogic
             this.tokenService = tokenService;
             this.configuration = configuration;
             this.recaptchaV2Service = recaptchaV2Service;
+            this.recaptchaV3Service = recaptchaV3Service;
         }
 
-        public async Task<User> ProcessRegisterUser(RegisterUser registerUser)
+        public async Task<User> ProcessRegisterUserWithRecaptcha(RegisterUser registerUser)
         {
             if (registerUser == null)
             {
                 throw new ArgumentNullException(nameof(registerUser));
             }
 
-            if (!await recaptchaV2Service.ValidateReCaptchaResponse(registerUser.Recaptcha))
+            // used for reCAPTCHA V2 
+            //if (!await recaptchaV2Service.ValidateReCaptchaResponse(registerUser.Recaptcha))
+            //{
+            //    throw new ApplicationException("Please validate ReCaptcha!");
+            //}
+
+            if (!await recaptchaV3Service.ValidateReCaptchaResponse(registerUser.Recaptcha))
             {
                 throw new ApplicationException("Please validate ReCaptcha!");
             }
 
+            return await ProcessRegisterUser(registerUser);
+        }
+
+        public async Task<User> ProcessRegisterUser(RegisterUser registerUser)
+        {
             if (await usersRepository.UsernameExists(registerUser.Username))
             {
                 throw new ApplicationException($"Username {registerUser.Username} is already used!");
@@ -56,16 +69,32 @@ namespace IdentityMicroservice.BusinessLogic
             return await usersRepository.Add(GetUserFromRegisterUser(registerUser));
         }
 
-        public async Task<User> ProcessAuthenticate(LoginCredentials loginCredentials)
+        public async Task<User> ProcessAuthenticateWithRecaptcha(LoginCredentials loginCredentials)
         {
             if (loginCredentials == null)
             {
                 throw new ArgumentNullException(nameof(loginCredentials));
             }
 
-            if (!await recaptchaV2Service.ValidateReCaptchaResponse(loginCredentials.Recaptcha))
+            // used for reCAPTCHA V2
+            //if (!await recaptchaV2Service.ValidateReCaptchaResponse(loginCredentials.Recaptcha))
+            //{
+            //    throw new ApplicationException("Please validate ReCaptcha!");
+            //}
+
+            if (!await recaptchaV3Service.ValidateReCaptchaResponse(loginCredentials.Recaptcha))
             {
                 throw new ApplicationException("Please validate ReCaptcha!");
+            }
+
+            return await ProcessAuthenticate(loginCredentials);
+        }
+
+        public async Task<User> ProcessAuthenticate(LoginCredentials loginCredentials)
+        {
+            if (loginCredentials is null)
+            {
+                throw new ArgumentNullException(nameof(loginCredentials));
             }
 
             User user = null;

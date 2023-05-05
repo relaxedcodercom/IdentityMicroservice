@@ -25,12 +25,26 @@ namespace IdentityMicroservice.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUser registerUser)
         {
+            return new ObjectResult(await authBusinessLogic.ProcessRegisterUserWithRecaptcha(registerUser));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register-mobile")]
+        public async Task<IActionResult> RegisterMobile([FromBody] RegisterUser registerUser)
+        {
             return new ObjectResult(await authBusinessLogic.ProcessRegisterUser(registerUser));
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] LoginCredentials loginCredentials)
+        {
+            return new ObjectResult(await authBusinessLogic.ProcessAuthenticateWithRecaptcha(loginCredentials));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate-mobile")]
+        public async Task<IActionResult> AuthenticateMobile([FromBody] LoginCredentials loginCredentials)
         {
             return new ObjectResult(await authBusinessLogic.ProcessAuthenticate(loginCredentials));
         }
